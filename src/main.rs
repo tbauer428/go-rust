@@ -1,87 +1,54 @@
-
-extern crate piston_window;
 extern crate find_folder;
-
-use piston_window::*;
-extern crate piston;
-extern crate opengl_graphics;
 extern crate graphics;
+extern crate opengl_graphics;
+extern crate piston;
+extern crate piston_window;
 extern crate touch_visualizer;
 
-// #[cfg(feature = "include_sdl2")]
-// extern crate sdl2_window;
-// #[cfg(feature = "include_glfw")]
-// extern crate glfw_window;
-// #[cfg(feature = "include_glutin")]
-// extern crate glutin_window;
-
-use touch_visualizer::TouchVisualizer;
-use opengl_graphics::{ GlGraphics, OpenGL };
-use graphics::{ Context, Graphics };
-use std::collections::HashMap;
-use std::*;
-use piston::window::{ AdvancedWindow, Window, WindowSettings };
-use piston::input::*;
-use piston::event_loop::*;
+#[cfg(feature = "include_glfw")]
+extern crate glfw_window;
+#[cfg(feature = "include_glutin")]
+extern crate glutin_window;
 #[cfg(feature = "include_sdl2")]
-use sdl2_window::Sdl2Window as AppWindow;
+extern crate sdl2_window;
+
 #[cfg(feature = "include_glfw")]
 use glfw_window::GlfwWindow as AppWindow;
 #[cfg(feature = "include_glutin")]
 use glutin_window::GlutinWindow as AppWindow;
+use graphics::{Context, Graphics};
+use opengl_graphics::{GlGraphics, OpenGL};
+use piston::event_loop::*;
+use piston::input::*;
+use piston::window::{AdvancedWindow, Window, WindowSettings};
+#[cfg(feature = "include_sdl2")]
+use sdl2_window::Sdl2Window as AppWindow;
+use std::collections::HashMap;
+use std::*;
+use touch_visualizer::TouchVisualizer;
 
 type AxisValues = HashMap<(u32, u8), f64>;
 
 fn main() {
-    // let mut window: PistonWindow = WindowSettings::new(
-    //     "piston: hello_world",
-    //     [200, 200]
-    // )
-    //     .exit_on_esc(true)
-    //     //.opengl(OpenGL::V2_1) // Set a different OpenGl version
-    //     .build()
-    //     .unwrap();
-
-    // let assets = find_folder::Search::ParentsThenKids(3, 3)
-    //     .for_folder("assets").unwrap();
-    // println!("{:?}", assets);
-    // let mut glyphs = window.load_font(assets.join("Verdana.ttf")).unwrap();
-    //
-    // window.set_lazy(true);
-    // while let Some(e) = window.next() {
-    //     window.draw_2d(&e, |c, g, device| {
-    //         let transform = c.transform.trans(10.0, 100.0);
-    //
-    //         clear([0.0, 0.0, 0.0, 1.0], g);
-    //         text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
-    //             "Hello world!",
-    //             &mut glyphs,
-    //             &c.draw_state,
-    //             transform, g
-    //         ).unwrap();
-    //
-    //         // Update glyphs before rendering.
-    //         glyphs.factory.encoder.flush(device);
-    //     });
-    //}
-
-
     let opengl = OpenGL::V3_2;
-    let mut window: AppWindow = WindowSettings::new("piston-example-user_input", [400, 400])
-        .exit_on_esc(true).graphics_api(opengl).build().unwrap();
+    let mut window: AppWindow = WindowSettings::new("go-rust", [400, 400])
+        .exit_on_esc(true)
+        .graphics_api(opengl)
+        .build()
+        .unwrap();
 
     println!("Press C to turn capture cursor on/off");
 
     let mut capture_cursor = false;
-    let ref mut gl = GlGraphics::new(opengl);
+    let gl = &mut GlGraphics::new(opengl);
     let mut cursor = [0.0, 0.0];
 
-    let mut touch_visualizer = TouchVisualizer::new();
+    let mut _touch_visualizer = TouchVisualizer::new();
     let mut axis_values: AxisValues = HashMap::new();
 
     let mut events = Events::new(EventSettings::new().lazy(true));
     while let Some(e) = events.next(&mut window) {
-        touch_visualizer.event(window.size(), &e);
+        _touch_visualizer.event(window.size(), &e);
         if let Some(Button::Mouse(button)) = e.press_args() {
             println!("Pressed mouse button '{:?}'", button);
         }
@@ -91,7 +58,6 @@ fn main() {
                 capture_cursor = !capture_cursor;
                 window.set_capture_cursor(capture_cursor);
             }
-
             println!("Pressed keyboard key '{:?}'", key);
         };
         if let Some(args) = e.button_args() {
@@ -117,22 +83,26 @@ fn main() {
         e.text(|text| println!("Typed '{}'", text));
         e.resize(|args| println!("Resized '{}, {}'", args.window_size[0], args.window_size[1]));
         if let Some(cursor) = e.cursor_args() {
-            if cursor { println!("Mouse entered"); }
-            else { println!("Mouse left"); }
+            if cursor {
+                println!("Mouse entered");
+            } else {
+                println!("Mouse left");
+            }
         };
         if let Some(args) = e.render_args() {
             // println!("Render {}", args.ext_dt);
             gl.draw(args.viewport(), |c, g| {
                 graphics::clear([1.0; 4], g);
-                draw_rectangles(cursor, &window, &c, g);
+                draw_rectangles(&window, &c, g);
                 draw_axis_values(&mut axis_values, &window, &c, g);
-                touch_visualizer.draw(&c, g);
+                _touch_visualizer.draw(&c, g);
                 graphics::ellipse(
                     [0.0, 1.0, 0.0, 1.0],
                     graphics::ellipse::circle(cursor[0], cursor[1], 5.0),
-                    c.transform, g);
-            }
-            );
+                    c.transform,
+                    g,
+                );
+            });
         }
         if let Some(_args) = e.idle_args() {
             // println!("Idle {}", _args.dt);
@@ -151,53 +121,37 @@ fn main() {
     }
 }
 
-fn draw_rectangles<G: Graphics>(
-    cursor: [f64; 2],
-    window: &dyn Window,
-    c: &Context,
-    g: &mut G,
-) {
+fn draw_rectangles<G: Graphics>(window: &dyn Window, c: &Context, g: &mut G) {
     let size = window.size();
     let draw_size = window.draw_size();
     let zoom = 0.2;
     let offset = 30.0;
 
-    let rect_border = graphics::Rectangle::new_border([1.0, 0.0, 0.0, 1.0], 1.0);
+    let _rect_border = graphics::Rectangle::new_border([1.0, 0.0, 0.0, 1.0], 1.0);
 
     // Cursor.
-    let cursor_color = [0.0, 0.0, 0.0, 1.0];
-    let zoomed_cursor = [offset + cursor[0] * zoom, offset + cursor[1] * zoom];
-    graphics::ellipse(
-        cursor_color,
-        graphics::ellipse::circle(zoomed_cursor[0], zoomed_cursor[1], 4.0),
-        c.transform,
-        g
-    );
+    let _cursor_color = [0.0, 0.0, 0.0, 1.0];
 
-    // User coordinates.
-    rect_border.draw([
-                         offset,
-                         offset,
-                         size.width as f64 * zoom,
-                         size.height as f64 * zoom
-                     ],
-                     &c.draw_state, c.transform, g);
+    // Rectangle.
     let rect_border = graphics::Rectangle::new_border([0.0, 0.0, 1.0, 1.0], 1.0);
     rect_border.draw(
         [
             offset + size.width as f64 * zoom,
             offset,
             draw_size.width as f64 * zoom,
-            draw_size.height as f64 * zoom
+            draw_size.height as f64 * zoom,
         ],
-        &c.draw_state, c.transform, g);
+        &c.draw_state,
+        c.transform,
+        g,
+    );
 }
 
 fn draw_axis_values<W: Window, G: Graphics>(
     axis_values: &mut AxisValues,
     window: &W,
     c: &Context,
-    g: &mut G
+    g: &mut G,
 ) {
     let window_height = window.size().height as f64;
     let max_axis_height = 200.0;
@@ -208,8 +162,12 @@ fn draw_axis_values<W: Window, G: Graphics>(
     let mut draw = |i, v: f64| {
         let i = i as f64;
         let height = (v + 1.0) / 2.0 * max_axis_height;
-        let rect = [offset + i * (width + offset),
-            top + max_axis_height - height, width, height];
+        let rect = [
+            offset + i * (width + offset),
+            top + max_axis_height - height,
+            width,
+            height,
+        ];
         graphics::rectangle(color, rect, c.transform, g);
     };
     for (i, &v) in axis_values.values().enumerate() {
