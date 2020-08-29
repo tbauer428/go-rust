@@ -1,6 +1,6 @@
 pub mod game;
 
-// use game::initialize_window;
+use game::initialize_window;
 use std::*;
 
 #[derive(Debug)]
@@ -16,16 +16,13 @@ enum Value {
     Empty,
 }
 
-
-
 impl Board {
     pub fn new(size: i32) -> Self {
         let mut row_number: i32 = 1;
-    
+
         let mut board_vec: Vec<Vec<Tile>> = vec![];
 
         while row_number <= size {
-
             let mut row: Vec<Tile> = vec![];
 
             let mut tile_number: i32 = 1;
@@ -34,12 +31,12 @@ impl Board {
 
                 row.push(tile);
 
-                tile_number+=1
+                tile_number += 1
             }
 
             board_vec.push(row);
 
-            row_number+=1
+            row_number += 1
         }
 
         Board(board_vec)
@@ -64,12 +61,8 @@ fn main() {
     let board_rows = &board.0;
 
     for x in 0..board_rows.len() {
-
-        println!("Row Number: {}: {}", x+1 ,format!("{:?}", board_rows[x]));
-
+        println!("Row Number: {}: {}", x + 1, format!("{:?}", board_rows[x]));
     }
 
-    // println!("{}", format!("{}", board));
-
-    // initialize_window()
+    initialize_window()
 }
