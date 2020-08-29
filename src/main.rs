@@ -1,47 +1,12 @@
 pub mod game;
+pub mod data;
 
 use game::initialize_window;
+use data::Value;
+use data::Board;
 use std::*;
 
-#[derive(Debug)]
-struct Board(Vec<Vec<Tile>>);
 
-#[derive(Debug)]
-struct Tile(i32, Value);
-
-#[derive(Debug)]
-enum Value {
-    White,
-    Black,
-    Empty,
-}
-
-impl Board {
-    pub fn new(size: i32) -> Self {
-        let mut row_number: i32 = 1;
-
-        let mut board_vec: Vec<Vec<Tile>> = vec![];
-
-        while row_number <= size {
-            let mut row: Vec<Tile> = vec![];
-
-            let mut tile_number: i32 = 1;
-            while tile_number <= size {
-                let tile = Tile(tile_number, Value::Empty);
-
-                row.push(tile);
-
-                tile_number += 1
-            }
-
-            board_vec.push(row);
-
-            row_number += 1
-        }
-
-        Board(board_vec)
-    }
-}
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -64,5 +29,5 @@ fn main() {
         println!("Row Number: {}: {}", x + 1, format!("{:?}", board_rows[x]));
     }
 
-    initialize_window()
+    initialize_window(board)
 }
