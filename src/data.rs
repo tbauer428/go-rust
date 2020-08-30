@@ -13,20 +13,29 @@ pub enum Value {
 
 impl Board {
     pub fn new(size: i32) -> Self {
-        let mut row_number: i32 = 1;
+        let mut row_number: i32 = 0;
 
         let mut board_vec: Vec<Vec<Tile>> = vec![];
 
-        while row_number <= size {
+        while row_number < size {
             let mut row: Vec<Tile> = vec![];
 
-            let mut tile_number: i32 = 1;
-            while tile_number <= size {
-                let tile = Tile(tile_number, Value::Empty);
+            let mut tile_number: i32 = 0;
 
-                row.push(tile);
+            while tile_number < size {
+                if row_number == 0 {
+                    let tile = Tile(tile_number + 1, Value::Empty);
 
-                tile_number += 1
+                    row.push(tile);
+
+                    tile_number += 1
+                } else {
+                    let tile = Tile(tile_number + (size * row_number) + 1, Value::Empty);
+
+                    row.push(tile);
+
+                    tile_number += 1
+                }
             }
 
             board_vec.push(row);
@@ -35,5 +44,9 @@ impl Board {
         }
 
         Board(board_vec)
+    }
+
+    pub fn standard() -> Self {
+        Board::new(19)
     }
 }
