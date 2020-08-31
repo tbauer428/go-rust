@@ -19,13 +19,14 @@ impl fmt::Display for Board {
 }
 
 fn main() {
-    let board = Board::new(13);
+    let board = Board::new(19);
 
-    // let board_rows = &board.0;
 
-    // for x in 0..board_rows.len() {
-    //     println!("Row Number: {}: {}", x + 1, format!("{:?}", board_rows[x]));
-    // }
+    // checking to see the board gets generated correctly
+    let board_rows = &board.0;
+    for x in 0..board_rows.len() {
+        println!("Row Number: {}: {}", x + 1, format!("{:?}", board_rows[x]));
+    }
 
     initialize_window(&board)
 }

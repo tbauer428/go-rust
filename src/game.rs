@@ -33,7 +33,7 @@ use crate::data::Value;
 
 pub fn initialize_window(board: &Board) {
     let opengl = OpenGL::V3_2;
-    let mut window: AppWindow = WindowSettings::new("go-rust", [600, 600])
+    let mut window: AppWindow = WindowSettings::new("go-rust", [650, 650])
         .exit_on_esc(true)
         .graphics_api(opengl)
         .resizable(false)
@@ -86,10 +86,9 @@ pub fn initialize_window(board: &Board) {
 }
 
 pub fn draw_grid<G: Graphics>(c: &Context, g: &mut G, board: &Board) {
-    let size = 600;
+    let size = board.0.len() * 20;
 
-
-    let field_rect = vec![0, 0, size, size];
+    let field_rect = vec![25, 25, size, size];
 
     let cell_w = size / board.0.len();
     let cell_h = size / board.0.len();
@@ -98,7 +97,7 @@ pub fn draw_grid<G: Graphics>(c: &Context, g: &mut G, board: &Board) {
     for i in 0..board.0.len() {
         graphics::line(
             [0.5, 0.5, 0.5, 1.0],
-            1.0,
+            2.0,
             [
                 (field_rect[0] + i * cell_w) as f64,
                 field_rect[1] as f64,
@@ -114,7 +113,7 @@ pub fn draw_grid<G: Graphics>(c: &Context, g: &mut G, board: &Board) {
     for i in 0..board.0.len() {
         graphics::line(
             [0.5, 0.5, 0.5, 1.0],
-            1.0,
+            2.0,
             [
                 field_rect[0] as f64,
                 (field_rect[1] + i * cell_h) as f64,
